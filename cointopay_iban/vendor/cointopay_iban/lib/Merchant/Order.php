@@ -1,0 +1,37 @@
+<?php
+namespace Cointopay_Iban\Merchant;
+
+use Cointopay_Iban\Cointopay;
+use Cointopay_Iban\Merchant;
+
+class Order extends Merchant
+{
+    private $order;
+
+    public function __construct($order)
+    {
+        $this->order = $order;
+    }
+    public static function createOrFail($params, $options = array(), $authentication = array())
+    {
+        $order = Cointopay::request('orders', 'GET', $params, $authentication);
+        if (is_string($order) && $order != 'testmerchant success') {
+            return $order;
+        } else {
+            return new self($order);
+        }
+    }
+    public static function ValidateOrder($params, $options = array(), $authentication = array())
+    {
+        $order = Cointopay::request('validation', 'GET', $params, $authentication);
+        return new self($order);
+    }
+    public function toHash()
+    {
+        return $this->order;
+    }
+    public function __get($name)
+    {
+        return $this->order[$name];
+    }
+}
