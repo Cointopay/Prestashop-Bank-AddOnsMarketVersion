@@ -397,6 +397,10 @@ class Cointopay_Iban extends PaymentModule
         $this->html .= $this->displayCointopay();
         // Create a link with the path
 
+        $ctp_bank_coins_ajax_link = $this->context->link->getModuleLink($this->name, 'getcoins', [], true);
+        // define js value to use in ajax url
+        Media::addJsDef(['ctp_bank_coins_ajax_link' => $ctp_bank_coins_ajax_link]);
+
         $this->context->controller->addCSS($this->_path . '/views/css/tabs.css', 'all');
         $this->context->controller->addJS($this->_path . '/views/js/javascript.js', 'all');
         $this->context->controller->addJS($this->_path . '/views/js/cointopay.js', 'all');

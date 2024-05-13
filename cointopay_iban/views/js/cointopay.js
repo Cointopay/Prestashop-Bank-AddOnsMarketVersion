@@ -23,6 +23,7 @@
  * International Registered Trademark & Property of PrestaShop SA
 */
 $(document).ready(function () {
+
     const merchant_id = $("#COINTOPAY_IBAN_MERCHANT_ID").val();
     getCoin(merchant_id);
 
@@ -33,21 +34,21 @@ $(document).ready(function () {
 
 function getCoin(id) {
 
-    const selected_currency = $('#selected_currency').val();
-    const postdata = {
+    var selected_currency = $('#selected_currency').val();
+    var postdata = {
         ajax: 1,
         merchant: id,
         token: token
     };
     if (id.length > 0) {
         $.ajax({
-            url: '../modules/cointopay_iban/getcoins.php',
+            url: ctp_bank_coins_ajax_link,
             type: "POST",
             data: postdata,
             success: function (result) {
-                const data = $.parseJSON(result);
-                let str = "";
-                const $crypto_currency = $('#crypto_currency');
+                var data = $.parseJSON(result);
+                var str = "";
+                var $crypto_currency = $('#crypto_currency');
 
                 $.each(data, function (index, value) {
                     if (data[index].id != 0) {
