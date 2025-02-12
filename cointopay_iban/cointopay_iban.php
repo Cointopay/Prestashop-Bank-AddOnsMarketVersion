@@ -1,6 +1,6 @@
 <?php
 /**
- * 2010-2024 PrestaShop
+ * 2010-2025 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author PrestaShop SA <contact@prestashop.com>
- *  @copyright  2010-2024 PrestaShop SA
+ *  @copyright  2010-2025 PrestaShop SA
  *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -208,7 +208,7 @@ class Cointopay_Iban extends PaymentModule
 
         if (
             !parent::install()
-            || !$this->registerHook('paymentReturn')
+            || !$this->registerHook('ActionpaymentReturn')
             || !$this->registerHook('paymentOptions')
         ) {
             return false;
@@ -286,8 +286,8 @@ class Cointopay_Iban extends PaymentModule
                     'user_agent' => 'Cointopay - Prestashop v' . _PS_VERSION_ . ' Extension v' . COINTOPAY_IBAN_PRESTASHOP_EXTENSION_VERSION,
                 ];
 
-                Cointopay_Iban\Cointopay::config($ctpConfig);
-                $merchant = Cointopay_Iban\Cointopay::verifyMerchant();
+                \cointopay_iban\Cointopay_Iban::config($ctpConfig);
+                $merchant = \cointopay_iban\Cointopay_Iban::verifyMerchant();
 
                 if ($merchant !== true) {
                     $this->postErrors[] = $this->l($merchant);
@@ -387,7 +387,7 @@ class Cointopay_Iban extends PaymentModule
     protected function getConfigFormValues()
     {
         $system_name = Configuration::get('COINTOPAY_IBAN_DISPLAY_NAME');
-        $display_name = (isset($system_name) && !empty($system_name)) ? $system_name : 'Cointopay Pay via Bank';
+        $display_name = !empty($system_name) ? $system_name : 'Cointopay Pay via Bank';
 
         return ['COINTOPAY_IBAN_DISPLAY_NAME' => $display_name, 'COINTOPAY_IBAN_MERCHANT_ID' => Configuration::get('COINTOPAY_IBAN_MERCHANT_ID'), 'COINTOPAY_IBAN_SECURITY_CODE' => Configuration::get('COINTOPAY_IBAN_SECURITY_CODE'), 'COINTOPAY_IBAN_CRYPTO_CURRENCY' => Configuration::get('COINTOPAY_IBAN_CRYPTO_CURRENCY')];
     }
@@ -432,26 +432,23 @@ class Cointopay_Iban extends PaymentModule
         return false;
     }
 
-    public function hookPaymentReturn($params)
+    public function hookActionPaymentReturn($params)
     {
-        /*
-         * Verify if this module is enabled
-         */
         if (!$this->active) {
             return;
         }
         $this->context->controller->addJS($this->_path . '/views/js/cointopay_custom.js', 'all');
-
         array_push($params, $_REQUEST);
-
+        // Check if 'CustomerReferenceNr' exists in the request
         if (isset($_REQUEST['CustomerReferenceNr'])) {
             $this->smarty->assign('getparams', $_REQUEST);
+            // Assign dynamic URLs to the template
             $this->context->smarty->assign([
                 'ctpAjaxUrl' => $this->context->link->getModuleLink($this->name, 'cointopay_waiting', [], true),
                 'ctpCallbackUrl' => $this->context->link->getModuleLink($this->name, 'callback', [], true),
             ]);
-
-            return $this->context->smarty->fetch('module:cointopay_iban/views/templates/hook/ctp_success_callback.tpl');
+            // Return the success callback template using explicit template path
+            return $this->context->smarty->fetch($this->getTemplatePath('views/templates/hook/ctp_success_callback.tpl'));
         }
     }
 

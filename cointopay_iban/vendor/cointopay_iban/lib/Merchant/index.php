@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2024 PrestaShop and Contributors
+ * 2007-2025 PrestaShop and Contributors
  *
  * NOTICE OF LICENSE
  *
@@ -19,10 +19,13 @@
  * needs please refer to https://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2024 PrestaShop SA and Contributors
+ * @copyright 2007-2025 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PrestaShop SA
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 header('Cache-Control: no-store, no-cache, must-revalidate');

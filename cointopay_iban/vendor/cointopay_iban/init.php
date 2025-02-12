@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 require(dirname(__FILE__) . '/lib/Cointopay.php');
 
 // Exception Class

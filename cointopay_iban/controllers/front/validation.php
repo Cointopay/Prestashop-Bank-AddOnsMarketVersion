@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2024 PrestaShop
+ * 2007-2025 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author PrestaShop SA <contact@prestashop.com>
- * @copyright  2007-2024 PrestaShop SA
+ * @copyright  2007-2025 PrestaShop SA
  * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -78,17 +78,20 @@ class Cointopay_IbanValidationModuleFrontController extends ModuleFrontControlle
         $merchant_id = Configuration::get('COINTOPAY_IBAN_MERCHANT_ID');
         $security_code = Configuration::get('COINTOPAY_IBAN_SECURITY_CODE');
         $user_currency = !empty($selected_currency) ? $selected_currency : Configuration::get('COINTOPAY_IBAN_CRYPTO_CURRENCY');
-        $selected_currency = (isset($user_currency) && !empty($user_currency)) ? $user_currency : 1;
+        $selected_currency = !empty($user_currency) ? $user_currency : 1;
         $ctpConfig = [
             'merchant_id' => $merchant_id,
             'security_code' => $security_code,
             'selected_currency' => $selected_currency,
             'user_agent' => 'Cointopay - Prestashop v' . _PS_VERSION_ . ' Extension v' . COINTOPAY_IBAN_PRESTASHOP_EXTENSION_VERSION,
         ];
-        $orderObj = new Order($this->module->currentOrder);
+        if (!class_exists('Cointopay_Iban\Merchant\Order')) {
+            throw new Exception('Cointopay_Iban\Merchant\Order class not found.');
+        }
+        $orderObj = new \Cointopay_Iban\Merchant\Order($this->module->currentOrder);
 
-        Cointopay_Iban\Cointopay::config($ctpConfig);
-        $order = Cointopay_Iban\Merchant\Order::createOrFail([
+        \cointopay_iban\Cointopay_Iban::config($ctpConfig);
+        $order = \Cointopay_Iban\Merchant\Order::createOrFail([
             'order_id' => implode('----', [$orderObj->reference, $this->module->currentOrder]),
             'price' => $total,
             'currency' => $this->currencyCode($currency->iso_code),

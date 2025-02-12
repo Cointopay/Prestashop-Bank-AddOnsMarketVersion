@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2024 PrestaShop and Contributors
+ * 2007-2025 PrestaShop and Contributors
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to https://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2024 PrestaShop SA and Contributors
+ * @copyright 2007-2025 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -60,7 +60,7 @@ class Cointopay_IbanCallbackModuleFrontController extends ModuleFrontController
             $merchant_id = Configuration::get('COINTOPAY_IBAN_MERCHANT_ID');
             $security_code = Configuration::get('COINTOPAY_IBAN_SECURITY_CODE');
             $user_currency = Configuration::get('COINTOPAY_IBAN_CRYPTO_CURRENCY');
-            $selected_currency = (isset($user_currency) && !empty($user_currency)) ? $user_currency : 1;
+            $selected_currency = !empty($user_currency) ? $user_currency : 1;
             $ctpConfig = [
                 'merchant_id' => $merchant_id,
                 'security_code' => $security_code,
@@ -68,8 +68,11 @@ class Cointopay_IbanCallbackModuleFrontController extends ModuleFrontController
                 'user_agent' => 'Cointopay - Prestashop v' . _PS_VERSION_ . ' Extension v' . COINTOPAY_IBAN_PRESTASHOP_EXTENSION_VERSION,
             ];
             sleep(5);
-            Cointopay_Iban\Cointopay::config($ctpConfig);
-            $response_ctp = Cointopay_Iban\Merchant\Order::ValidateOrder([
+            if (!class_exists('Cointopay_Iban\Merchant\Order')) {
+                throw new Exception('Cointopay_Iban\Merchant\Order class not found.');
+            }
+            \cointopay_iban\Cointopay_Iban::config($ctpConfig);
+            $response_ctp = \Cointopay_Iban\Merchant\Order::ValidateOrder([
                 'TransactionID' => $TransactionID,
                 'ConfirmCode' => $ConfirmCode,
             ]);
